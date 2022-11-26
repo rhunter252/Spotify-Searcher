@@ -8,6 +8,8 @@ const Search = () => {
   const [searchInput, setSearchInput] = useState("");
   const [accessToken, setAccessToken] = useState("");
   const [albums, setAlbums] = useState([]);
+  const [artists, setArtists] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     var authParameters = {
@@ -35,6 +37,8 @@ const Search = () => {
         Authorization: "Bearer " + accessToken,
       },
     };
+
+    // Get ArtistID
     let artistID = await fetch(
       "https://api.spotify.com/v1/search?q=" + searchInput + "&type=artist",
       searchParameters
@@ -45,6 +49,22 @@ const Search = () => {
       });
 
     console.log(artistID);
+
+    // Get Artist
+    const returnedartist = await fetch(
+      `https://api.spotify.com/v1/search?q=${searchInput}&type=artist`,
+      searchParameters
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        //artist is an OBJECT
+        //here, artist is set to the 0 index of an array of objects
+        setArtists(data.artists.items[0]);
+        artistID = data.artists.items[0].id;
+
+        console.log(data);
+        console.log(data.artists.items[0].images[0].url);
+      });
     // Get request with Artist ID grab all the albums from that artist
     let returnedAlbums = await fetch(
       "https://api.spotify.com/v1/artists/" +
@@ -61,37 +81,71 @@ const Search = () => {
 
     //   Display albums to user
     console.log(albums);
+
+    setLoading(false);
   }
 
   return (
-    <>
-      <div className="container flex justify-center">
-        <input
-          type="input"
-          placeholder="Search"
-          onKeyPress={(e) => {
-            if (e.code === "Enter") {
-              search();
-            }
-          }}
-          onChange={(e) => setSearchInput(e.target.value)}
-          className="border-2 border-black"
-        />
-        <button
-          onClick={search}
-          className="inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
-        >
-          Submit
-        </button>
+    <div className="flex flex-col h-full">
+      <div className="flex flex-col justify-center mx-auto">
+        <div className="relative text-gray-600 focus-within:text-gray-400">
+          <span className="absolute inset-y-0 left-0 flex items-center pl-2">
+            <button
+              type="submit"
+              className="p-1 focus:outline-none focus:shadow-outline"
+            >
+              <svg
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+                className="w-6 h-6"
+              >
+                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </button>
+          </span>
+          <input
+            type="search"
+            onKeyPress={(e) => {
+              if (e.code === "Enter") {
+                search();
+              }
+            }}
+            onChange={(e) => setSearchInput(e.target.value)}
+            className="py-2 text-sm text-white bg-gray-900 rounded-md pl-10 focus:outline-none focus:bg-white focus:text-gray-900 w-60"
+            placeholder="Search..."
+            autoComplete="off"
+          />
+        </div>
       </div>
+
       <div className="container">
-        <div className="content-center md:px-10 xl:px-40 py-12">
-          <div className="mt-8 grid lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-10">
+        <div className="md:px-15 xl:px-40 py-12">
+          <div className="mx-auto w-4/5 pb-4 lg:w-2/3">
+            {loading ? null : (
+              <div className="flex flex-col justify-between rounded-lg bg-neutral-800 shadow-md shadow-black transition-all duration-300 sm:h-96 sm:flex-row xl:h-[min] 2xl:h-[50vh]">
+                <div>
+                  <img
+                    key={artists.id}
+                    src={artists.images[0].url}
+                    alt="artist-image"
+                    className="w-full rounded-b-lg sm:h-96 sm:rounded-r-lg sm:rounded-bl-none xl:h-[min] 2xl:h-[50vh]"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="mx-auto mt-8 grid w-4/5 grid-cols-2 lg:grid-cols-3 lg:w-2/3 md:grid-cols-2 sm:grid-cols-1 gap-4">
             {albums.map((album, i) => {
               return (
-                <div className="rounded-lg shadow-lg bg-white max-w-sm">
+                <div className="rounded-lg shadow-lg bg-white max-w-sm shadow-black transition-all duration-300 hover:-translate-y-1 hover:cursor-pointer hover:shadow-lg hover:shadow-neutral-700">
                   <a href="#!">
                     <img
+                      key={album.id}
                       className="rounded-t-lg"
                       src={album.images[0].url}
                       alt="album-image"
@@ -104,12 +158,6 @@ const Search = () => {
                     <p className="text-gray-700 text-base mb-4">
                       {album.release_date.slice(0, 4)}
                     </p>
-                    <button
-                      type="button"
-                      className=" inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
-                    >
-                      Button
-                    </button>
                   </div>
                 </div>
               );
@@ -117,7 +165,7 @@ const Search = () => {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 export default Search;
