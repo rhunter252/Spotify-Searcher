@@ -2,30 +2,29 @@ import React from "react";
 
 const Card = ({ album, i }) => {
   return (
-    <div className="container">
-      <div className="content-center md:px-10 xl:px-40 py-12">
-        <div className="mt-8 grid lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-10">
-          <div className="rounded-lg shadow-lg bg-white max-w-sm">
+    <div className="mx-auto mt-8 grid w-4/5 grid-cols-2 lg:grid-cols-3 lg:w-2/3 md:grid-cols-2 sm:grid-cols-1 gap-4">
+      {albums.map((album, i) => {
+        return (
+          <div className="rounded-lg shadow-lg bg-white max-w-sm shadow-black transition-all duration-300 hover:-translate-y-1 hover:cursor-pointer hover:shadow-lg hover:shadow-neutral-700">
             <a href="#!">
-              <img className="rounded-t-lg" src={null} alt="album-image" />
+              <img
+                key={album.id}
+                className="rounded-t-lg"
+                src={album.images[0].url}
+                alt="album-image"
+              />
             </a>
             <div className="p-6">
               <h5 className="text-gray-900 text-xl font-medium mb-2">
                 {album.name}
               </h5>
               <p className="text-gray-700 text-base mb-4">
-                {album.release_date}
+                {album.release_date.slice(0, 4)}
               </p>
-              <button
-                type="button"
-                className=" inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
-              >
-                Button
-              </button>
             </div>
           </div>
-        </div>
-      </div>
+        );
+      })}
     </div>
   );
 };

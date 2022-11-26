@@ -132,13 +132,45 @@ const Search = () => {
                     key={artists.id}
                     src={artists.images[0].url}
                     alt="artist-image"
-                    className="w-full rounded-b-lg sm:h-96 sm:rounded-r-lg sm:rounded-bl-none xl:h-[min] 2xl:h-[50vh]"
+                    className="w-full rounded-l-lg sm:h-96 sm:rounded-l-lg sm:rounded-bl-none xl:h-[min] 2xl:h-[50vh]"
                   />
+                </div>
+                <div className="flex flex-col text-white mt-6 mx-auto">
+                  <p className="text-4xl">{artists.name}</p>
+                  <p className="mt-1">
+                    {artists.followers.total
+                      ?.toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}{" "}
+                    Followers
+                  </p>
+                  <button className="w-[90px] rounded bg-green-600 px-2 py-1 text-white shadow-sm shadow-neutral-700 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md hover:shadow-neutral-700 mt-4">
+                    <a
+                      target="_blank"
+                      rel="noreferrer"
+                      href={`https://open.spotify.com/artist/${artists.id}`}
+                      className="flex w-full items-center justify-between"
+                    >
+                      Open{" "}
+                      <img
+                        src={"https://www.svgrepo.com/show/355256/spotify.svg"}
+                        alt="Spotify logo"
+                        className="h-6"
+                      />
+                    </a>
+                  </button>
+                  <div className="mt-4 flex w-full flex-col">
+                    {artists.genres.slice(0, 3).map((genre) => {
+                      return (
+                        <p className="m-[1px] flex w-min whitespace-nowrap rounded bg-black px-2 py-1 text-sm text-white">
+                          {genre}
+                        </p>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             )}
           </div>
-
           <div className="mx-auto mt-8 grid w-4/5 grid-cols-2 lg:grid-cols-3 lg:w-2/3 md:grid-cols-2 sm:grid-cols-1 gap-4">
             {albums.map((album, i) => {
               return (
