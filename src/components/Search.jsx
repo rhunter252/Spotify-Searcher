@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Card from "./Card";
+import Modal from "./Modal";
 
 const CLIENT_ID = "a3c7d448f35e47a38fb55cce57d0a151";
 const CLIENT_SECRET = "0e5f3aa7e03e4969b7e00057477fb8a2";
@@ -10,6 +10,8 @@ const Search = () => {
   const [albums, setAlbums] = useState([]);
   const [artists, setArtists] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [modal, setModal] = useState(false);
+  const [modalData, setModalData] = useState(null);
 
   useEffect(() => {
     var authParameters = {
@@ -28,7 +30,6 @@ const Search = () => {
 
   // Search function
   async function search() {
-    console.log("Search for " + searchInput);
     // Get request using search to get the Artist ID
     let searchParameters = {
       method: "GET",
@@ -48,8 +49,6 @@ const Search = () => {
         return data.artists.items[0].id;
       });
 
-    console.log(artistID);
-
     // Get Artist
     const returnedartist = await fetch(
       `https://api.spotify.com/v1/search?q=${searchInput}&type=artist`,
@@ -63,7 +62,6 @@ const Search = () => {
         artistID = data.artists.items[0].id;
 
         console.log(data);
-        console.log(data.artists.items[0].images[0].url);
       });
     // Get request with Artist ID grab all the albums from that artist
     let returnedAlbums = await fetch(
@@ -78,9 +76,6 @@ const Search = () => {
         console.log(data);
         setAlbums(data.items);
       });
-
-    //   Display albums to user
-    console.log(albums);
 
     setLoading(false);
   }
@@ -115,7 +110,7 @@ const Search = () => {
               }
             }}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="py-2 text-sm text-white bg-gray-900 rounded-md pl-10 focus:outline-none focus:bg-white focus:text-gray-900 w-60"
+            className="py-2 text-sm text-white bg-gray-900 rounded-md pl-10 focus:outline-black focus:bg-white focus:text-gray-900 w-60"
             placeholder="Search..."
             autoComplete="off"
           />
@@ -132,7 +127,7 @@ const Search = () => {
                     key={artists.id}
                     src={artists.images[0].url}
                     alt="artist-image"
-                    className="w-full rounded-l-lg sm:h-96 sm:rounded-l-lg sm:rounded-bl-none xl:h-[min] 2xl:h-[50vh]"
+                    className="w-full rounded-l-lg sm:h-96 sm:rounded-l-lg lg:rounded-l-lg sm:rounded-bl-none xl:h-[min] 2xl:h-[50vh]"
                   />
                 </div>
                 <div className="flex flex-col text-white mt-6 mx-auto">
@@ -161,7 +156,7 @@ const Search = () => {
                   <div className="mt-4 flex w-full flex-col">
                     {artists.genres.slice(0, 3).map((genre) => {
                       return (
-                        <p className="m-[1px] flex w-min whitespace-nowrap rounded bg-black px-2 py-1 text-sm text-white">
+                        <p className="m-[1px] flex w-min whitespace-nowrap rounded bg-black px-2 py-1 text-sm text-white mb-2">
                           {genre}
                         </p>
                       );
@@ -171,11 +166,21 @@ const Search = () => {
               </div>
             )}
           </div>
+
           <div className="mx-auto mt-8 grid w-4/5 grid-cols-2 lg:grid-cols-3 lg:w-2/3 md:grid-cols-2 sm:grid-cols-1 gap-4">
             {albums.map((album, i) => {
               return (
-                <div className="rounded-lg shadow-lg bg-white max-w-sm shadow-black transition-all duration-300 hover:-translate-y-1 hover:cursor-pointer hover:shadow-lg hover:shadow-neutral-700">
-                  <a href="#!">
+                <div
+                  className="rounded-lg shadow-lg bg-white max-w-sm shadow-black transition-all duration-300 hover:-translate-y-1 hover:cursor-pointer hover:shadow-lg hover:shadow-neutral-700"
+                  key={i}
+                >
+                  <a
+                    href="#!"
+                    onClick={() => {
+                      setModalData(album);
+                      setModal(true);
+                    }}
+                  >
                     <img
                       key={album.id}
                       className="rounded-t-lg"
@@ -194,6 +199,20 @@ const Search = () => {
                 </div>
               );
             })}
+            {loading ? null : (
+              <div onClick={() => setModal(false)}>
+                <Modal
+                  key={modalData?.id}
+                  modal={modal}
+                  artistName={modalData?.artists[0].name}
+                  image={modalData?.images[0].url}
+                  albumName={modalData?.name}
+                  date={modalData?.release_date}
+                  tracks={modalData?.total_tracks}
+                  id={modalData?.id}
+                ></Modal>
+              </div>
+            )}
           </div>
         </div>
       </div>
