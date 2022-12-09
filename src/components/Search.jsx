@@ -104,8 +104,9 @@ const Search = () => {
           </span>
           <input
             type="search"
-            onKeyPress={(e) => {
-              if (e.code === "Enter") {
+            onKeyDown={(e) => {
+              let key = e.which || e.code || 0;
+              if (key == 13) {
                 search();
               }
             }}
